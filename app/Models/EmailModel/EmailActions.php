@@ -10,16 +10,17 @@ class EmailActions extends Model
 {
     use HasFactory;
 
-    public static function apiCall($method, $api_key, $endpoint, $body_param = [], $query_param = [],
-    )
+    public static function apiCall($method, $api_key, $endpoint, $body_param = [])
     {
-        $response = Http::withHeaders([
+        $base_Url   =   'https://api.sendinblue.com/v3/';
+
+        $response   =   Http::withHeaders([
 
             'api-key' => $api_key,
             'content-type' => 'application/json',
             'accept' => 'application/json',
 
-        ])->$method('https://api.sendinblue.com/v3/smtp/'. $endpoint, $body_param);
+        ])->$method($base_Url.$endpoint, $body_param);
         
         //$data = json_decode($response); //this is done for testing
 

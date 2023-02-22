@@ -5,17 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Email\TransactionalController;
 use App\Http\Controllers\Email\CampaignController;
+use Faker\Guesser\Name;
 
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
@@ -28,5 +19,9 @@ Route::controller(TransactionalController::class)->group(function(){
 
 //The route group below is mainly for all the actions in the CampaignController class
 Route::controller(CampaignController::class)->group(function(){
-    route::get('campaign-email', 'sendCampaignEmail')->name('campaign-email');
+    route::post('create-campaign-email', 'createCampaignEmail')->name('create-campaign-email');
+    route::post('send-campaign-email', 'sendCampaignEmail')->name('send-campaign-email');
+    route::get('get-campaign-emails', 'getCampaignEmails')->name('get-campaign-emails');
+    route::get('get-single-campaign-email/{campaignId}', 'getSingleCampaignEmail')->name('get-single-campaign-email');
+    ROUTE::delete('delete-campaign-email/{campaignId}', 'deleteCampaignEmail')->name('delete-campaign-email');
 });

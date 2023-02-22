@@ -5,43 +5,53 @@ namespace App\Http\Controllers\Email;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\EmailModel\EmailActions;
+use Exception;
+use Illuminate\Support\Facades\Log;
 
 class TransactionalController extends Controller
 {
     public function sendTransactionalEmail(Request $req)
     {
-        $method         =   'post';
-        $api_key        =   config('sendinblue.api_key'); //This should come from the Deywuro Code
-        $endpoint       =   'email';
-        $feedback       =   '';
+        $method           =   'POST';
+        $api_key          =   config('sendinblue.api_key'); //This should come from the Deywuro Code
+        $endpoint         =   'smtp/email';
+        $feedback         =   [];
         
         $body_param = [
-            'sender'        =>      ['name'     => $req->senderName,    'email' => $req->senderEmail],
-            'to'            =>      [['name'    => $req->recipientName, 'email' => $req->recipientEmail]],
-            'subject'       =>      $req->subject,
-            'htmlContent'   =>      '<h1>'. $req->emailContent .'</h1>'
+            'sender'      =>  ['name'     => $req->senderName,    'email' => $req->senderEmail],
+            'to'          =>  [['name'    => $req->recipientName, 'email' => $req->recipientEmail]],
+            'subject'     =>  $req->subject,
+            'htmlContent' =>  '<h1>'. $req->emailContent .'</h1>'
         ];
-
-        $response   =   EmailActions::apiCall($method, $api_key, $endpoint, $body_param);
-
-        $data       =   json_decode($response, true);
-
         
+        try {
 
-        //return $body_param['to'][0]['email'];
+            //API CALL HERE
+            $response   =   EmailActions::apiCall($method, $api_key, $endpoint, $body_param);
 
-        if(array_key_exists('messageId', $data)){
+            $data       =   json_decode($response, true);
+
+            if(array_key_exists('messageId', $data)){
             
-            $feedback = 'Email is successfully sent to ' . $body_param['to'][0]['email'];
+                $feedback['message']    = 'Email is successfully sent to ' . $body_param['to'][0]['email'];
+
+            }
+            else {
+                $feedback['code']       = $data['code'];
+                $feedback['message']    = $data['message'];
+            }
+
+            return response()->json(
+                $feedback,
+                $status   =     200, 
+            );
+
+        } catch (Exception $ex) {
+            
+            Log::emergency($ex->getMessage());
+
+            return ['error' => 'Sorry, an error has occured'];
 
         }
-        else {
-            $feedback = 'Sorry, we encountered a problem. Contact administrator for assistance.';
-        }
-
-        return response()->json(
-            $result   =     [$data, $feedback],
-            $status   =     200 
-        );
     }
 }

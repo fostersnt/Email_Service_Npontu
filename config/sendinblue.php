@@ -2,9 +2,9 @@
 
     return [
 
-       'smtp_key' =>  env('SENDINBLUE_SMTP_KEY'),
+       'smtp_key'           =>  env('SENDINBLUE_SMTP_KEY'),
 
-        'api_key' =>  env('SENDINBLUE_API_KEY'),
+        'api_key'           =>  env('SENDINBLUE_API_KEY'),
         
     ];
 
